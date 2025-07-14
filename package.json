@@ -1,0 +1,16 @@
+{
+  "name": "backend-yt",
+  "version": "1.0.0",
+  "description": "backedn with hitesh sir",
+  "keywords": [
+    "javascript",
+    "baackend"
+  ],
+  "license": "ISC",
+  "author": "Ayan Bhattacharjee",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
