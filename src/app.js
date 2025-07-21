@@ -15,12 +15,12 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' })); // Increase the 
 app.use(express.static('public')); // Serve static files from the 'public' directory
 app.use(cookieParser()); // Parse cookies
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
-app.get('/', (req, res) => {
-  res.send('Hello, World!');
-});
+// Import routes
+import userRoutes from './routes/user.route.js';
+
+// Declaration of routes
+app.use('/api/v1/users', userRoutes);
+
 
 
 export { app, PORT };
