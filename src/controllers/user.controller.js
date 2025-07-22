@@ -19,7 +19,7 @@ const registerUser = asyncHandler(async (req, res) => {
   }
 
   // Check if user already exists
-  User.findOne({ 
+  await User.findOne({ 
     $or: [{ email }, { username }]  //dono mei se koi bhi match ho to
   }).then((existingUser) => {  
     if (existingUser) {
@@ -27,12 +27,13 @@ const registerUser = asyncHandler(async (req, res) => {
     }
   });
 
-  console.log(req.files);
-  
-
   // Files uploaded on local storage and got their paths which are stored in req.files
   const avatarLocalPath = req.files?.avatar[0]?.path;
-  const coverImageLocalPath = req.files?.coverImage[0]?.path;
+  // const coverImageLocalPath = req.files?.coverImage[0]?.path;
+  let coverImageLocalPath;
+  if(req.files?.coverImage && Array.isArray(req.files.coverImage) && req.files.coverImage.length > 0) {
+    coverImageLocalPath = req.files.coverImage[0].path;
+  }
 
   if (!avatarLocalPath) {
     throw new ApiError(400, "Avatar is required");
