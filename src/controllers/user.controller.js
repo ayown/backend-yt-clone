@@ -6,7 +6,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 
 const registerUser = asyncHandler(async (req, res) => {
 
-  // this res is coming from the frontend
+  // the res is coming from the frontend
 
   // Extract user data from request body
   const { username, email, fullName, password } = req.body;
