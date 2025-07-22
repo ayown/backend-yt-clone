@@ -52,6 +52,7 @@ const userSchema = new Schema(
     }
 )
 
+// Hash/Encrypt the password before saving the user
 userSchema.pre("save", async function (next) {
     if(!this.isModified("password")) return next();
 
@@ -59,10 +60,12 @@ userSchema.pre("save", async function (next) {
     next()
 })
 
+// Method to check if the password is correct
 userSchema.methods.isPasswordCorrect = async function(password){
     return await bcrypt.compare(password, this.password)
 }
 
+// Method to generate access and refresh tokens
 userSchema.methods.generateAccessToken = function(){
     return jwt.sign(
         {
