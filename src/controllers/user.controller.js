@@ -27,6 +27,9 @@ const registerUser = asyncHandler(async (req, res) => {
     }
   });
 
+  console.log(req.files);
+  
+
   // Files uploaded on local storage and got their paths which are stored in req.files
   const avatarLocalPath = req.files?.avatar[0]?.path;
   const coverImageLocalPath = req.files?.coverImage[0]?.path;
