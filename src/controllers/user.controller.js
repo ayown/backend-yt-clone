@@ -70,5 +70,10 @@ const registerUser = asyncHandler(async (req, res) => {
 
 });
 
-   
-export { registerUser };
+const loginUser = asyncHandler(async (req, res) => {
+  // Login logic will go here
+  // This is just a placeholder function for now
+  res.status(200).json({ message: "Login functionality not implemented yet" });
+});
+
+export { registerUser, loginUser };
