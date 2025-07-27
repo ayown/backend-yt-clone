@@ -19,14 +19,11 @@ export const verifyUserbyJWT = asyncHandler(async (req, res, next) => {
     const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
 
     // find the user by ID from the decoded token
-    const user = await User.findById(decodedToken?.id).select(
-      "-password -refreshToken"
-    );
+    const user = await User.findById(decodedToken?.id).select("-password -refreshToken");
     if (!user) {
       return new ApiError(404, "User not found").send(res);
     }
-    // Attach user to the request object
-    req.user = user;
+    req.user = user; // Attach user to the request object
     next();
   } catch (error) {
     return new ApiError(500, error?.message || "Internal server error");

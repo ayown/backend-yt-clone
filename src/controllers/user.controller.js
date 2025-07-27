@@ -3,6 +3,7 @@ import { ApiError } from "../utils/ApiError.js";
 import { User } from "../models/user.model.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
+import jwt from "jsonwebtoken";
 
 // Generate tokens
 const generateAccessAndRefreshTokens = async (userId) => {
@@ -23,6 +24,7 @@ const generateAccessAndRefreshTokens = async (userId) => {
   }
 };
 
+// User registration
 const registerUser = asyncHandler(async (req, res) => {
   // the res is coming from the frontend
 
@@ -54,11 +56,8 @@ const registerUser = asyncHandler(async (req, res) => {
 
   // const coverImageLocalPath = req.files?.coverImage[0]?.path;
   let coverImageLocalPath;
-  if (
-    req.files?.coverImage &&
-    Array.isArray(req.files.coverImage) &&
-    req.files.coverImage.length > 0
-  ) {
+  if (req.files?.coverImage && Array.isArray(req.files.coverImage) && req.files.coverImage.length > 0)
+  {
     coverImageLocalPath = req.files.coverImage[0].path;
   }
 
@@ -98,6 +97,7 @@ const registerUser = asyncHandler(async (req, res) => {
     .json(new ApiResponse(201, createdUser, "User registered successfully"));
 });
 
+// User login
 const loginUser = asyncHandler(async (req, res) => {
   // Extract user data from request body
   const { email, username, password } = req.body;
@@ -160,6 +160,7 @@ const loginUser = asyncHandler(async (req, res) => {
     );
 });
 
+// User logout
 const logoutUser = asyncHandler(async (req, res) => {
   const user = req.user._id;
 
@@ -189,4 +190,45 @@ const logoutUser = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, null, "User logged out successfully"));
 });
 
-export { registerUser, loginUser, logoutUser };
+const refreshAccessToken = asyncHandler(async (req, res) => {
+
+  //incomingRefreshToken : encoded hi hai
+  const incomingRefreshToken = req.cookies.refreshToken || req.body.refreshToken ;
+  if(!incomingRefreshToken){
+    throw new ApiError(401, "Unauthorized request");
+  }
+
+try {
+    //incomingRefreshToken -convertedTo-> decodedToken(consisting of Headers, Payload, Signature)
+    const decodedToken = jwt.verify(incomingRefreshToken, process.env.REFRESH_TOKEN_SECRET);
+  
+    const user = await User.findById(decodedToken?._id)
+    if(!user){
+      throw new ApiError(401, "Invalid Refresh Token");
+    }
+  
+    //final check : do encoded tokens ka check -> incominingRefreshToken(from the user side browser) and the encoded token which is also saved in the database after the creation of the entire token(Refresh or acces, whatever) in GENERATETOKENS function(at the top)
+    if( incomingRefreshToken !== user?.refreshToken){
+      throw new ApiError(401, "Refresh Token is expired or used");
+    }
+  
+    const cookieOptions = {
+      httpOnly: true,
+      secure: true , // Set to true in production
+    }
+    const {accessToken, newrefreshToken} = await generateAccessAndRefreshTokens(user._id)
+  
+    return res
+    .status(200)
+    .cookie("accessToken", accessToken)
+    .cookie("refreshToken", newrefreshToken, cookieOptions)
+    .json(
+      new ApiResponse(200, { accessToken, refreshToken : newrefreshToken }, " access token refreshed succesfully")
+    );
+} catch (error) {
+  throw new ApiError(401, error?.message || "Invalid Refresh Token")
+}
+
+});
+
+export { registerUser, loginUser, logoutUser,refreshAccessToken };
