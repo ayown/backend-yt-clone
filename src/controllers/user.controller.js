@@ -257,6 +257,7 @@ const getCurrentUser = asyncHandler(async (req, res) => {
   return res.status(200).json(new ApiResponse(200, user, "User fetched successfully"));
 });
 
+// Update text-based account details
 const updateAccountDetails = asyncHandler(async(req, res) => {
     const {fullName, email} = req.body
 
@@ -281,6 +282,7 @@ const updateAccountDetails = asyncHandler(async(req, res) => {
     .json(new ApiResponse(200, user, "Account details updated successfully"))
 });
 
+// Update user avatar
 const updateUserAvatar = asyncHandler(async(req, res) => {
     const avatarLocalPath = req.file?.path
 
@@ -289,6 +291,7 @@ const updateUserAvatar = asyncHandler(async(req, res) => {
     }
 
     //TODO: delete old image - assignment
+
 
     const avatar = await uploadOnCloudinary(avatarLocalPath)
 
@@ -314,6 +317,7 @@ const updateUserAvatar = asyncHandler(async(req, res) => {
     )
 })
 
+// Update user cover image
 const updateUserCoverImage = asyncHandler(async(req, res) => {
     const coverImageLocalPath = req.file?.path
 
@@ -322,7 +326,6 @@ const updateUserCoverImage = asyncHandler(async(req, res) => {
     }
 
     //TODO: delete old image - assignment
-
 
     const coverImage = await uploadOnCloudinary(coverImageLocalPath)
 
