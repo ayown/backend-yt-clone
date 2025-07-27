@@ -190,6 +190,7 @@ const logoutUser = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, null, "User logged out successfully"));
 });
 
+// Access token refreshed
 const refreshAccessToken = asyncHandler(async (req, res) => {
 
   //incomingRefreshToken : encoded hi hai
@@ -231,4 +232,28 @@ try {
 
 });
 
-export { registerUser, loginUser, logoutUser,refreshAccessToken };
+// Change current password
+const changeCurrentPassword = asyncHandler(async (req, res) => {
+  const { oldPassword, newPassword } = req.body;
+  
+  const user = await User.findById(req.user?.id);
+  const isPasswordCorrect = await user.isPasswordCorrect(oldPassword);
+  if (!isPasswordCorrect) {
+    throw new ApiError(401, "Old password is incorrect");
+  }
+
+  user.password = newPassword;
+  await user.save({ validateBeforeSave: false }); // Skip validation for password field
+
+  return res.status(200).json(new ApiResponse(200, null, "Password changed successfully"));
+});
+
+const getCurrentUser = asyncHandler(async (req, res) => {
+  const user = await req.user; // req.user is set by the auth middleware
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+  return res.status(200).json(new ApiResponse(200, user, "User fetched successfully"));
+});
+
+export { registerUser, loginUser, logoutUser, refreshAccessToken, changeCurrentPassword, getCurrentUser };
